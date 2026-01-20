@@ -1,21 +1,47 @@
 import string #to transform string
+from collections import Counter 
+import math
 chat_memory=[] #to store chat history
 
 
-INTENTS = {
-    "greetings":{
-        "keywords": {"hi", "hello", "hey"},
-        "response": "Hello"
-    },
-    "farewells":{
-        "keywords": {"bye", "goodbye", "see"},
-        "response": "Goodbye"
-    },
-    "status":{
-        "phrases": {"how are you", "how r you"},
-        "response": "I am fine, thank you! How about you?"
-    }
+INTENT_EXAMPLES = {
+    "greetings": [
+        "hi",
+        "hello",
+        "hey there"
+    ],
+    "farewells": [
+        "bye",
+        "goodbye",
+        "see you"
+    ],
+    "status": [
+        "how are you",
+        "how are things",
+        "how is it going"
+    ]
 }
+
+INTENT_RESPONSES = {
+    "greetings": "Hello",
+    "farewells": "Goodbye",
+    "status": "I am fine, thank you! How about you?"
+}
+
+def cosine_similarity(vect1, vect2):
+    intersection = set(vect1.keys()) & set(vect2.keys())
+    numerator = sum(vect1[x] * vect2[x] for x in intersection)
+    sum1 = sum(v**2 for v in vect1.values())
+    sum2 = sum(v**2 for v in vect2.values())
+    denominator = math.sqrt(sum1) * math.sqrt(sum2)
+
+    denominator = math.sqrt(sum1) * math.sqrt(sum2)
+    if not denominator:
+        return 0.0
+    return numerator / denominator
+
+def text_to_vector(text):
+    return Counter(text.split())
 
 def preprocess(text): #cleaning the text
     text = text.lower() #turns any text to lower case
@@ -23,21 +49,22 @@ def preprocess(text): #cleaning the text
     return text
 
 def detect_intent(text): #defining the intent of message
-    for intent, data in INTENTS.items():
-        if "phrases" in data:
-            for phrase in data["phrases"]:
-                if phrase in text:
-                    return intent
-                
-    words = set(text.split()) #to identify each word separately
+    text_vec = text_to_vector(text)
+    best_intent = None
+    best_score = 0
+    #loop through examples instead of phrase
 
-    for intent, data in INTENTS.items():
-        if "keywords" in data and words & data["keywords"]:
-            return intent
-        
+    for intent, examples in INTENT_EXAMPLES.items():
+        for example in examples:
+            example_vec = text_to_vector(example)
+            score = cosine_similarity(text_vec, example_vec)
+            if score> best_score:
+                best_score = score
+                best_intent = intent    
+    if best_score > 0.3:
+        return best_intent
     return "unknown"
-    
-
+                
 def ai_chatbot(user_input): #function for chatbot
     clean_input = preprocess(user_input)
     intent = detect_intent(clean_input)
@@ -47,7 +74,7 @@ def ai_chatbot(user_input): #function for chatbot
         "intent": intent
     })
 
-    return INTENTS.get(intent, {}).get("response", "I dont understand")
+    return INTENT_RESPONSES.get(intent, "I dont understand")
     
 while True:
     user = input("you:")
