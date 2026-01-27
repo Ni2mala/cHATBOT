@@ -22,6 +22,11 @@
       "user": "history",
       "intent": "unknown",
       "entities": {}
+    },
+    {
+      "user": "hi",
+      "intent": "greetings",
+      "entities": {}
     }
   ]
 }

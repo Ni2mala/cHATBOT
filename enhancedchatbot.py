@@ -7,7 +7,7 @@ import json #for saving and loading data in json format
 
 DEBUG_MODE = True #set to false to turn off debug message
 chat_memory=[] #to store chat history
-user_name = None #New store the uer's name globally
+user_name = None #New store the user's name globally
 
 training_data = [
     # Greetings - Different ways people say hello
@@ -216,7 +216,19 @@ Returns:
         print(f"[ERROR] could not load the chat history: {e}")
         return False
 
+def view_chat_history():
+    """
+    displays the chat history in readbale format"""
+    if not chat_memory:
+        print("\n [No chat history yet]\n")
+        return
+    print("Chat History")
 
+    for i, entry in enumerate(chat_memory, 1):
+        print(f"\n[{i}] You: {entry['user']}")
+        print(f"\n Intent: {entry['intent']}")
+        if entry.get('entities'):
+            print(f" Entities:{entry['entities']}")
 
 
 
@@ -283,6 +295,10 @@ while True:
         print("chatbot: Please enter a message.")
         continue #skip to next iteration if input is empty
 
+    #check if user wants to view history
+    if user.lower() == "history":
+        view_chat_history()
+        continue
     #check if user want to exit
     if user.lower() in ["bye", "exit", "quit"]:
         print("bot: Goodbye! Have a great day!")
@@ -290,6 +306,8 @@ while True:
         break
     #get bot response
     print("bot:", ai_chatbot(user))
+    if len(chat_memory)%5==0:
+        save_chat_history()
     
 
 
