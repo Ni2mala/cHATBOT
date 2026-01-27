@@ -9,9 +9,9 @@ def ai_chatbot(user_input):
     elif user_input.lower() == "bye":
         return "goodbye"
     elif user_input.lower() == "how are you?":
-        return("I am good how are you")
+        return "I am good how are you"
     elif user_input.lower() == "k gardai xau":
-        return "timilai sochdai xu"
+        return "Timilai sochdai xu"
     else:
         return "I don't understand"
     

@@ -1,0 +1,27 @@
+{
+  "user_name": "John",
+  "chat_history": [
+    {
+      "user": "hi",
+      "intent": "greetings",
+      "entities": {}
+    },
+    {
+      "user": "my name is John",
+      "intent": "introduction",
+      "entities": {
+        "name": "John"
+      }
+    },
+    {
+      "user": "hello",
+      "intent": "greetings",
+      "entities": {}
+    },
+    {
+      "user": "history",
+      "intent": "unknown",
+      "entities": {}
+    }
+  ]
+}
