@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 import random
 import re
 import json #for saving and loading data in json format
+from datetime import datetime 
 
 DEBUG_MODE = True #set to false to turn off debug message
 chat_memory=[] #to store chat history
@@ -71,6 +72,50 @@ training_data = [
     ("this is tom", "introduction"),
     ("my name is alice", "introduction"),
     ("you can call me bob", "introduction"),
+    
+    # Jokes - When user wants to laugh
+    ("tell me a joke", "joke"),
+    ("make me laugh", "joke"),
+    ("say something funny", "joke"),
+    ("do you know any jokes", "joke"),
+    ("joke please", "joke"),
+    ("i need a joke", "joke"),
+    
+    # Time - When user asks about time
+    ("what time is it", "time"),
+    ("tell me the time", "time"),
+    ("what's the time", "time"),
+    ("current time", "time"),
+    ("time please", "time"),
+    
+    # Date - When user asks about date
+    ("what's the date", "date"),
+    ("what is today's date", "date"),
+    ("tell me the date", "date"),
+    ("what day is it", "date"),
+    ("today's date", "date"),
+    
+    # Capabilities - When user asks what bot can do
+    ("what can you do", "capabilities"),
+    ("what are your capabilities", "capabilities"),
+    ("help me understand what you can do", "capabilities"),
+    ("what features do you have", "capabilities"),
+    ("tell me about yourself", "capabilities"),
+    
+    # Small talk - Compliments
+    ("you are great", "compliment"),
+    ("you are awesome", "compliment"),
+    ("you're amazing", "compliment"),
+    ("good job", "compliment"),
+    ("well done", "compliment"),
+    ("you're smart", "compliment"),
+    
+    # Small talk - How old
+    ("how old are you", "age"),
+    ("what is your age", "age"),
+    ("when were you born", "age"),
+    ("your age", "age"),
+
 ]
 
 INTENT_RESPONSES = {
@@ -117,12 +162,44 @@ INTENT_RESPONSES = {
         "Hmm, I'm not familiar with that. Can you explain differently?",
         "Sorry, I don't understand. Could you say that another way?"
     ],
-      "introduction": [
+    "introduction": [
         "Nice to meet you, {name}!",
         "Hello {name}! Great to meet you!",
         "Hi {name}! How can I help you today?",
         "Welcome {name}! What can I do for you?"
     ],
+    "joke":[
+        "{joke}",
+    ],
+    "time":[
+        "The current time is {time}.",
+        "It's {time} right now.",
+        "Right now it's {time}.",
+    ],
+    "date": [
+        "Today's date is {date}.",
+        "It's {date} today.",
+        "Today is {date}.",
+    ],
+    "capabilities": [
+        "I can help you with several things:\n• Have conversations and remember your name\n• Tell you the time and date\n• Tell jokes\n• Answer basic questions\n• And more! Just ask me anything!",
+        "I'm here to assist! I can:\n• Chat with you\n• Remember your name\n• Tell jokes and the time/date\n• Keep track of our conversation history\nWhat would you like to do?",
+    ],
+    "compliment": [
+        "Thank you! You're very kind!",
+        "Aww, thanks! You made my day!",
+        "That's so nice of you to say!",
+        "Thank you! I'm just trying my best to help!",
+        "You're awesome too! Thanks for the compliment!",
+    ],
+    "age": [
+        "I'm an AI, so I don't really have an age!",
+        "I was created recently, but I don't age like humans do!",
+        "Age is just a number for humans, but I'm timeless! 😊",
+        "I'm as old as this conversation, and as young as the next one!",
+    ],
+
+
 }
 
 
@@ -215,6 +292,31 @@ Returns:
     except Exception as e:
         print(f"[ERROR] could not load the chat history: {e}")
         return False
+    
+def get_current_time():
+    """
+    Returns the current time in a readable format
+    """
+    now = datetime.now()
+    return now.strftime("%I:%M%p")
+
+def get_current_date():
+    now = datetime.now()
+    return now.strftime("%B %d %Y")
+
+def get_random_joke():
+    jokes = [
+        "Why don't scientists trust atoms? Because they make up everything!",
+        "Why did the scarecrow win an award? Because he was outstanding in his field!",
+        "What do you call a bear with no teeth? A gummy bear!",
+        "Why don't eggs tell jokes? They'd crack each other up!",
+        "What did the ocean say to the beach? Nothing, it just waved!",
+        "Why did the math book look sad? Because it had too many problems!",
+        "What do you call a fake noodle? An impasta!",
+        "Why can't a bicycle stand on its own? It's two tired!",
+    ]
+    return random.choice(jokes)
+
 
 def view_chat_history():
     """
@@ -240,7 +342,7 @@ def detect_intent(text): #predecting the intent
     if DEBUG_MODE:
         predicted = model.classes_[probs.argmax()]
         print(f"[DEBUG] Predicted intent: {predicted} with probability {max_prob:.2f}")
-    if max_prob < 0.3:
+    if max_prob < 0.2:
         return "unknown"
     return model.classes_[probs.argmax()]
    
@@ -275,6 +377,21 @@ def ai_chatbot(user_input): #function for chatbot
 
     elif intent == "introduction":
             response = "Nice to meet you! What's your name?"
+
+    #For dynamic response
+    if intent =="joke":
+        joke = get_random_joke()
+        response = joke
+
+    if intent =="time":
+        current_time = get_current_time()
+        response = response.replace("{time}", current_time)
+
+    if intent =="date":
+        current_date = get_current_date()
+        response = response.replace("{date}", current_date)
+
+    
 
     return response
 

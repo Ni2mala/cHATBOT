@@ -7,7 +7,7 @@ def ai_chatbot(user_input):
     if user_input.lower() == "hi":
         return "hello"
     elif user_input.lower() == "bye":
-        return "goodbye"
+        return"goodbye"
     elif user_input.lower() == "how are you?":
         return "I am good how are you"
     elif user_input.lower() == "k gardai xau":
