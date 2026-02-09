@@ -1,0 +1,24 @@
+print()
+```
+
+Prints an empty line for readability between conversations
+
+---
+
+## Visual Summary of the Whole Process:
+```
+User types: "What time do you close?"
+                ↓
+1. Convert to vector: [0.0, 0.45, 0.67, ...]
+                ↓
+2. Intent Classifier predicts: "hours_inquiry" (83% confidence)
+                ↓
+3. Filter dataset: Only get "hours_inquiry" rows (50 out of 500)
+                ↓
+4. Convert user input to retrieval vector
+                ↓
+5. Calculate similarity with all 50 filtered queries
+                ↓
+6. Find best match: Row 48 has 89% similarity
+                ↓
+7. Return response: "We're open 8am-6pm daily"
