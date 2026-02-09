@@ -26,6 +26,30 @@ Your response style:
 - Offer multiple solutions when appropriate
 - Be honest about limitations and uncertainties"""
 
+#save chat memory 
+def save_chat(filename="chat_history.json"):
+    with open("chat_history.json", "w") as f:
+        data ={
+            "chat_history": conversation_history
+        }
+
+        json.dump("chat_history", f, indent=2)
+        return True
+
+
+def chat_with_memory(user_input, conversation_history, system_context):
+    full_context = system_context
+    for msg in conversation_history:
+        full_context += f"\n{msg}"
+
+    response = chat_ollama(user_input, full_context)
+
+    conversation_history.append(f"user: {user_input}")
+    conversation_history.append(f"assistant: {response}")
+
+
+
+conversation_history = []
 
 while True:
     user_input = input().lower()
@@ -33,5 +57,5 @@ while True:
     if user_input.lower() in ['exit', 'bye','quit']:
         print("goodbye!")
         break
-    response = chat_ollama(user_input, system_context)
+    response = chat_with_memory(user_input, conversation_history, system_context)
     print(f"\n{response}\n")
