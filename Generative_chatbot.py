@@ -27,13 +27,13 @@ Your response style:
 - Be honest about limitations and uncertainties"""
 
 #save chat memory 
-def save_chat(filename="chat_history.json"):
+def save_chat(conversation_history,filename="chat_history.json"):
     with open("chat_history.json", "w") as f:
         data ={
             "chat_history": conversation_history
         }
 
-        json.dump("chat_history", f, indent=2)
+        json.dump(data, f, indent=2)
         return True
 
 
@@ -47,15 +47,22 @@ def chat_with_memory(user_input, conversation_history, system_context):
     conversation_history.append(f"user: {user_input}")
     conversation_history.append(f"assistant: {response}")
 
+    return response
+
 
 
 conversation_history = []
 
 while True:
-    user_input = input().lower()
+    user_input = input()
     
     if user_input.lower() in ['exit', 'bye','quit']:
+        save_chat(conversation_history)
         print("goodbye!")
         break
     response = chat_with_memory(user_input, conversation_history, system_context)
     print(f"\n{response}\n")
+
+
+
+
