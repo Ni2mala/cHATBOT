@@ -1,63 +1,63 @@
 
 import requests
 import json
-
-
-
-def chat_ollama(prompt, context=''):
-    response = requests.post('http://localhost:11434/api/generate', #Sends a request to Ollama's API 
+ 
+conversation_history = []
+system_context ="""You are a professional customer support assistant 
+for an online clothing brand. Help customers with:
+- Product details (size, color, fabric, fit, care)
+- Pricing, discounts, availability
+- Orders, shipping, tracking
+- Returns, exchanges, refunds
+Be clear, friendly, and concise."""
+def chat_ollama(message_list):
+    response = requests.post('http://localhost:11434/api/chat', #Sends a request to Ollama's API 
                              json={
                                  "model": "llama3.2",
-                                 "prompt":f"{context}\nUser:{prompt}\nAssistant:",
+                                 "messages":message_list,
                                  "stream":False,
                              })
-    return json.loads(response.text)['response']
-system_context ="""You are a helpful, harmless, and honest AI assistant similar to Claude.
+    return response.json()['message']['content']
 
-Your response style:
-- Be genuinely helpful and go into appropriate depth
-- Use clear structure (but don't overuse bullet points unless needed)
-- Explain concepts thoroughly but concisely
-- Provide practical examples and code when relevant
-- Be conversational and natural, not robotic
-- Anticipate follow-up questions
-- Use emojis sparingly (only when it adds value)
-- Break down complex topics into digestible pieces
-- Offer multiple solutions when appropriate
-- Be honest about limitations and uncertainties"""
 
 #save chat memory 
-def save_chat(conversation_history,filename="chat_history.json"):
-    with open("chat_history.json", "w") as f:
-        data ={
-            "chat_history": conversation_history
-        }
-
+def save_chat(filename="chat_history.json"):
+    with open(filename, "w") as f:
+        data ={"chat_history": conversation_history}
         json.dump(data, f, indent=2)
         return True
 
+#imagine you are talking to someone with 10 second amnesia,
+#you need to remind them every last 10 seconds of conversation 
 
 def chat_with_memory(user_input, conversation_history, system_context):
-    full_context = system_context
+    if len(conversation_history) > 20: 
+        conversation_history = conversation_history.pop(0)# Limit history to last 20 messages
+    message_list = [{"role": "system", "content": system_context}]
+    message_list.extend(conversation_history)
+    message_list.append({"role": "user", "content": user_input})
+
+    print("----Sending to Ollama API----")
+    print(json.dumps(message_list, indent =2))
+
+    response = chat_ollama(message_list)
+    """full_context = system_context
     for msg in conversation_history:
-        full_context += f"\n{msg}"
+        full_context += f"\n{msg}"#glues every old question and answer onto the new question, so the model can remember the conversation history
 
-    response = chat_ollama(user_input, full_context)
+    response = chat_ollama(user_input, full_context)"""
 
-    conversation_history.append(f"user: {user_input}")
-    conversation_history.append(f"assistant: {response}")
+    conversation_history.append({"role": "user", "content": user_input})
+    conversation_history.append({"role": "assistant", "content": response})
 
     return response
 
 
 
-conversation_history = []
-
 while True:
-    user_input = input()
+    user_input = input().lower()
     
     if user_input.lower() in ['exit', 'bye','quit']:
-        save_chat(conversation_history)
         print("goodbye!")
         break
     response = chat_with_memory(user_input, conversation_history, system_context)
