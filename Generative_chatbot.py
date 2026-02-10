@@ -38,8 +38,6 @@ def chat_with_memory(user_input, conversation_history, system_context):
     message_list.extend(conversation_history)
     message_list.append({"role": "user", "content": user_input})
 
-    print("----Sending to Ollama API----")
-    print(json.dumps(message_list, indent =2))
 
     response = chat_ollama(message_list)
     """full_context = system_context
