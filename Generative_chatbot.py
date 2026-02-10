@@ -25,15 +25,14 @@ def save_chat(history_to_save,filename="chat_history.json"):
     with open(filename, "w") as f:
         data ={"chat_history": history_to_save}
         json.dump(data, f, indent=2)
-        return True
+    
+    return True
 
 #imagine you are talking to someone with 10 second amnesia,
 #you need to remind them every last 10 seconds of conversation 
 
 def chat_with_memory(user_input, conversation_history, system_context):
-    while len(conversation_history) > 20:
-
-        del conversation_history[0:2]# Limit history to last 20 messages
+    
     message_list = [{"role": "system", "content": system_context}]
     message_list.extend(conversation_history)
     message_list.append({"role": "user", "content": user_input})
@@ -48,6 +47,9 @@ def chat_with_memory(user_input, conversation_history, system_context):
 
     conversation_history.append({"role": "user", "content": user_input})
     conversation_history.append({"role": "assistant", "content": response})
+    while len(conversation_history) > 20:
+
+        del conversation_history[0:2]# Limit history to last 20 messages
 
     return response
 
