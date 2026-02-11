@@ -39,13 +39,13 @@ def chat_with_memory(user_input, conversation_history, system_context):
     message_list.append({"role": "user", "content": user_input})
 
     response = chat_ollama(message_list)
+
     conversation_history.append({"role": "user", "content": user_input})
     conversation_history.append({"role": "assistant", "content": response})
     while len(conversation_history) > 20:
 
         del conversation_history[0:2]# Limit history to last 20 messages
     return response
-
 
 
 while True:
