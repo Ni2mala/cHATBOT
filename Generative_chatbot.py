@@ -1,4 +1,3 @@
-
 import requests
 import json
  
@@ -10,6 +9,8 @@ for an online clothing brand. Help customers with:
 - Orders, shipping, tracking
 - Returns, exchanges, refunds
 Be clear, friendly, and concise."""
+
+
 def chat_ollama(message_list):
     response = requests.post('http://localhost:11434/api/chat', #Sends a request to Ollama's API 
                              json={
@@ -37,27 +38,18 @@ def chat_with_memory(user_input, conversation_history, system_context):
     message_list.extend(conversation_history)
     message_list.append({"role": "user", "content": user_input})
 
-
     response = chat_ollama(message_list)
-    """full_context = system_context
-    for msg in conversation_history:
-        full_context += f"\n{msg}"#glues every old question and answer onto the new question, so the model can remember the conversation history
-
-    response = chat_ollama(user_input, full_context)"""
-
     conversation_history.append({"role": "user", "content": user_input})
     conversation_history.append({"role": "assistant", "content": response})
     while len(conversation_history) > 20:
 
         del conversation_history[0:2]# Limit history to last 20 messages
-
     return response
 
 
 
 while True:
-    user_input = input().lower()
-    
+    user_input = input() 
     if user_input.lower() in ['exit', 'bye','quit']:
         save_chat(conversation_history)
         print("goodbye!")

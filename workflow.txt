@@ -22,3 +22,12 @@ User types: "What time do you close?"
 6. Find best match: Row 48 has 89% similarity
                 ↓
 7. Return response: "We're open 8am-6pm daily"
+
+
+
+
+"""full_context = system_context
+    for msg in conversation_history:
+        full_context += f"\n{msg}"#glues every old question and answer onto the new question, so the model can remember the conversation history
+
+    response = chat_ollama(user_input, full_context)"""
